@@ -1,0 +1,4 @@
+folder app/Models
+- chứa các file .php tương ứng, mỗi file chứa các hàm để tương tác với cơ sở dữ liệu
+- kế thừa class models trong core/Models.php
+
