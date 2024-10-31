@@ -2,3 +2,58 @@ folder app/Models
 - chứa các file .php tương ứng, mỗi file chứa các hàm để tương tác với cơ sở dữ liệu
 - kế thừa class models trong core/Models.php
 
+1. Xử lý đăng xuất và xóa Tokenluudangnhap
+$stmt = $con->prepare("UPDATE thongtintaikhoan SET Tokenluudangnhap = NULL, Ngayhethantoken = NULL WHERE Tokenluudangnhap = ?");
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $stmt->close();
+2. Kiểm tra Tokenluudangnhap và tự động đăng nhập nếu Thoigianluudangnhap còn hạn
+$stmt = $con->prepare("SELECT MaTK, PhanQuyen FROM thongtintaikhoan WHERE Tokenluudangnhap = ? AND Ngayhethantoken > NOW()");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $stmt->store_result();
+3. Truy vấn lấy thông tin (Xử lý đăng nhập)
+$stmt = $con->prepare("SELECT thongtintaikhoan.MaTK, thongtintaikhoan.MatKhau, thongtintaikhoan.TrangThaiHoatDong, 
+                                  thongtintaikhoan.Solansaidangnhap, thongtintaikhoan.Lanchothulai, 
+                                  thongtincanhan.Email, thongtintaikhoan.PhanQuyen
+                           FROM thongtintaikhoan 
+                           JOIN thongtincanhan ON thongtintaikhoan.MaTK = thongtincanhan.MaKH 
+                           WHERE thongtintaikhoan.TenDangNhap = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+4. Kiểm tra trạng thái tài khoản, với các tài khoản bị tạm khóa, nếu hết hạn khóa thì mở lại tài khoản
+$stmt = $con->prepare("UPDATE thongtintaikhoan SET TrangThaiHoatDong = 1, Solansaidangnhap = 0, Lanchothulai = NULL WHERE MaTK = ?");
+                $stmt->bind_param("i", $maTK);
+                $stmt->execute();
+5. Xóa 1 vài thông tin khi đăng nhập thành công
+$stmt = $con->prepare("
+                UPDATE thongtintaikhoan 
+                SET 
+                    Lanchothulai = NULL,
+                    Tokenxacnhan = NULL,
+                    Ngayhethanxacnhan = NULL,
+                    Solansaidangnhap = 0
+                WHERE MaTK = ?
+            ");
+            $stmt->bind_param("i", $maTK);
+            $stmt->execute();
+6. Trường hợp đăng nhập thành công và chọn Remember me, lưu Tokenluudangnhap vào CSDL
+$stmt = $con->prepare("UPDATE thongtintaikhoan SET Tokenluudangnhap = ?, Ngayhethantoken = ? WHERE MaTK = ?");
+                $stmt->bind_param("ssi", $token, date('Y-m-d H:i:s', $expire), $maTK);
+                $stmt->execute();
+7. Cập nhật Solandangnhapsai với mỗi lần đăng nhập sai mật khẩu
+$stmt = $con->prepare("UPDATE thongtintaikhoan SET Solansaidangnhap = ? WHERE MaTK = ?");
+            $stmt->bind_param("ii", $solansaidangnhap, $maTK);
+            $stmt->execute();
+8. Lưu thời gian chờ thử lại với 3 lần đăng nhập sai liên tiếp (tương tự với 4 lần)
+$currentTime = date('Y-m-d H:i:s'); 
+                $lanchothulai = date('Y-m-d H:i:s', strtotime($currentTime . ' +30 seconds'));
+                $stmt = $con->prepare("UPDATE thongtintaikhoan SET Lanchothulai = ? WHERE MaTK = ?");
+                $stmt->bind_param("si", $lanchothulai, $maTK);
+                $stmt->execute();
+9. Khóa tài khoản nếu nhập sai 5 lần liên tiếp
+$stmt = $con->prepare("UPDATE thongtintaikhoan SET TrangThaiHoatDong = 0, Lanchothulai = ? WHERE MaTK = ?");
+                $lanchothulai = date('Y-m-d H:i:s', strtotime('+60 minutes')); // Thời gian khóa tài khoản 60 phút
+                $stmt->bind_param("si", $lanchothulai, $maTK);
+                $stmt->execute();
