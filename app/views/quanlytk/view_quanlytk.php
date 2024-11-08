@@ -86,6 +86,24 @@ session_start();
         .pagination a:hover:not(.active) { background-color: #ddd; }
         .button { background-color: gray; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; transition: background-color 0.3s; font-size: 15px; }
         .button:hover { background-color: black; }
+        .logout-button {
+        background-color: black;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 10px;
+        transition: background-color 0.3s;
+        position: fixed;
+        top: 10px; 
+        right: 10px; 
+        }
+
+        .logout-button:hover {
+            background-color: #cc0000;
+        }
+
     </style>
     <script>
         function checkRoleChange(selectElement, id) {
@@ -101,6 +119,10 @@ session_start();
 <body>
 
 <h2>Quản Lý Người Dùng</h2>
+
+<form method="POST" action="controller_quanlytk.php?action=logout">
+    <button type="submit" class="logout-button">Đăng Xuất</button>
+</form>
 
 <form method="POST" action="">
     <input type="text" name="search" placeholder="Tìm kiếm tài khoản" value="<?php echo htmlspecialchars($search); ?>">
