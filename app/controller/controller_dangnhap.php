@@ -1,5 +1,6 @@
 <?php
     require_once 'core/core_controller.php';
+    require_once 'core/core_models.php';
     class controller_dangnhap extends Controller
     {
         private $dangnhapmodel;
@@ -16,7 +17,7 @@
         public function login($username, $password, $captcha, $remember) {
             // Kiểm tra mã captcha
             if ($captcha !== $_SESSION['captcha_code']) {
-                echo '<script>alert("Mã captcha không đúng. Vui lòng thử lại."); window.location.href = "index.php";</script>';
+                echo '<script>alert("Mã captcha không đúng. Vui lòng thử lại."); window.location.href = "app/views/dangnhap/view_dangnhap.php";</script>';
                 exit();
             }
     
@@ -32,7 +33,7 @@
                 }
                 exit;
             } else {
-                echo '<script>alert("' . $result['message'] . '"); window.location.href = "index.php";</script>';
+                echo '<script>alert("' . $result['message'] . '"); window.location.href = "app/views/dangnhap/view_dangnhap.php";</script>';
                 exit();
             }
         }
@@ -46,7 +47,7 @@
     
             session_unset();
             session_destroy();
-            header("Location: index.php");
+            header("Location: app/views/dangnhap/view_dangnhap.php");
             exit;
         }
     
@@ -57,7 +58,7 @@
     
                 if ($result['status'] === 'success') {
                     $_SESSION['user_id'] = $result['user_id'];
-                    header("Location: " . ($result['role'] === 'admin' ? "qluserview.php" : "welcome.php"));
+                    header("Location: " . ($result['role'] === 'admin' ? "app/views/quanlytk/view_quanlytk.php" : "wapp/views/home/trangchu.php"));
                     exit;
                 }
             }
