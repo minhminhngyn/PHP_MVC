@@ -29,27 +29,31 @@
         public function insert_thongtintaikhoan($object) 
         {
             $thuocTinh = get_object_vars($object);
-            $slthuoctinh=count($thuocTinh);
-            
-            $query="INSERT INTO {$this->table_thongtintaikhoan} (MaTK, TenDangNhap, MatKhau, NgayTao, 
-            NguoiTao, NgaySua, NguoiSua, PhanQuyen, TrangThaiHoatDong, TrangThaiXacThuc, TokenEmail, 
-            ThoiGianTokenEmail,ThoiGianHieuLuc) 
+            $slthuoctinh = count($thuocTinh);
+
+            $query = "INSERT INTO {$this->table_thongtintaikhoan} (MaTK, TenDangNhap, MatKhau, NgayTao, NguoiTao, NgaySua, NguoiSua, PhanQuyen, TrangThaiHoatDong, TrangThaiXacThuc, TokenEmail, ThoiGianTokenEmail, ThoiGianHieuLuc) 
             VALUES (";
-            $i=1;
-            foreach ($thuocTinh as $key => $value)
-            {
-                if (is_string($value))
-                    $query.="'$value'";
-                else
-                    $query.="{$value}";
-                if ($i!=$slthuoctinh)
-                    $query.=",";
-                $i=$i+1;
-            }
-            $query.=")";
-            echo "<br> <h3>cau lenh sql: ".$query;
-            return $this->con->query($query);
             
+            $i = 1;
+            foreach ($thuocTinh as $key => $value) {
+                if (is_null($value)) {
+                    $query .= "NULL";
+                } elseif (is_string($value)) {
+                    $query .= "'$value'";
+                } else {
+                    $query .= "{$value}";
+                }
+
+                if ($i != $slthuoctinh) {
+                    $query .= ",";
+                }
+                $i++;
+            }
+            $query .= ")";
+
+            echo "<br> <h3>Câu lệnh SQL: " . $query;
+            return $this->con->query($query);
         }
+
     }
 ?>
