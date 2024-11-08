@@ -31,7 +31,9 @@
             $thuocTinh = get_object_vars($object);
             $slthuoctinh = count($thuocTinh);
 
-            $query = "INSERT INTO {$this->table_thongtintaikhoan} (MaTK, TenDangNhap, MatKhau, NgayTao, NguoiTao, NgaySua, NguoiSua, PhanQuyen, TrangThaiHoatDong, TrangThaiXacThuc, TokenEmail, ThoiGianTokenEmail, ThoiGianHieuLuc) 
+            $query = "INSERT INTO {$this->table_thongtintaikhoan} 
+            (MaTK, TenDangNhap, MatKhau, NgayTao, NguoiTao, NgaySua, NguoiSua, PhanQuyen, 
+            TrangThaiHoatDong, TrangThaiXacThuc, TokenEmail, ThoiGianTokenEmail, ThoiGianHieuLuc) 
             VALUES (";
             
             $i = 1;

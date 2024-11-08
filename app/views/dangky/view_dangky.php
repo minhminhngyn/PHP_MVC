@@ -15,7 +15,7 @@
     <div>
         <h3> Đăng ký tài khoản </h3>
     </div>
-    <form action='/ktra2/MVC_ktra2/dangky/store' method='POST'>
+    <form action='/ktra2/MVC_ktra2_repo/dangky/store' method='POST'>
         <div class='cus_infor'>
             <h4> Thông tin người đăng ký</h4>
             <table>
