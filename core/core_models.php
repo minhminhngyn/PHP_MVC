@@ -1,7 +1,8 @@
 <?php
     class Model
     {
-        protected $host, $user, $pass, $db, $con;
+        protected $con;
+        protected $host, $user, $pass, $db;
 
         public function __construct() 
         {

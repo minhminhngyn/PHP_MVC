@@ -15,7 +15,7 @@
     <div>
         <h3> Đăng ký tài khoản </h3>
     </div>
-    <form action='xl_dki.php'  method='POST'>
+    <form action='/ktra2/MVC_ktra2/dangky/store' method='POST'>
         <div class='cus_infor'>
             <h4> Thông tin người đăng ký</h4>
             <table>
@@ -66,7 +66,7 @@
         <button type='button' id='reset_value'>Làm lại</button>
         <input type='submit' value='Đăng ký'>
     </form>
-    <script src="../../design/js/frm_dki.js"></script> 
+    <script src="design/js/frm_dki.js"></script> 
 
 </body>
 </html>
