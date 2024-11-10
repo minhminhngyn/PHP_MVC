@@ -1,0 +1,104 @@
+Những yêu cầu khác chưa xử lý được:
+**.Sau 5 lần nhập sai liên tiếp: 
+Nếu ko xác nhận thì hết Ngayhethanxacnhan, cần xóa thông tin Tokenxacnhan và Ngayhethantoken, ko reset Solandangnhapsai
+Vẫn cố đăng nhập tiếp: Hạn chế số lần khóa???
+
+1. Sửa lại query cho đồng nhất với CSDL chung
+
+Luồng xử lý Đăng nhập
+Tiến hành đăng nhập, thực hiện kiểm tra mã captcha (lưu trong session) trước, rồi mới kiểm tra thông tin tài khoản
+nếu hợp lệ thì đăng nhập hệ thống
+nếu không hợp lệ: (1 trong các trường hợp sau):
+- Sai mã Captcha
+- Sai tên đăng nhập
+- Sai mật khẩu: 
+    +> Sai 1-2 lần: Giới hạn cho phép, không xử lý/cảnh báo gì
+    +> Sai 3 lần liên tiếp: Đợi 30s để tiếp tục đăng nhập lần thứ 4
+    +> Sai 4 lần liên tiếp: Đợi 60s để tiếp tục đăng nhập lần thứ 5
+    +> Sai 5 lần liên tiếp: Thực hiện tạm khóa tài khoản (1h), Lanchothulai = Ngayhethantoken
+                            Gửi mail xác nhận (gắn link), nếu xác nhận thì reset Solansaidangnhap =0
+                            nếu không thì tiếp tục count Solansaudangnhap tiếp (Chưa xử lý sâu đoạn sau đó)
+
+Yêu cầu:
+1. Database: 
+- Nguoidung: MaND, TenND, Email
+- TaikhoanND: MaTK, TenTK, Matkhau, NgaytaoTK, NguoitaoTK, Vaitro, TrangthaiTK, MaND, NgaykhoaTK, Solansaidangnhap, Tokenluudangnhap, Ngayhethantoken, Lanchothulai, Tokenxacnhan, Ngayhethanxacnhan
+
+**Lưu ý: Cơ chế tự động xóa cookie hoặc yêu cầu đăng nhập lại khi token hết hạn
+
+2. Captcha
+Captcha được xử lý trực tiếp trong phiên (session) của người dùng trên máy chủ
+Khi người dùng tải lại trang hoặc yêu cầu mã captcha mới, một captcha mới sẽ được tạo, hiển thị trên form, và giá trị của nó được lưu tạm trong phiên. 
+Cụ thể:
+- Khi người dùng mở trang đăng nhập, hệ thống tạo một mã captcha ngẫu nhiên và lưu giá trị này vào session của phiên đăng nhập hiện tại.
+- Khi người dùng nhập mã captcha và gửi form đăng nhập, hệ thống sẽ lấy mã từ session để so sánh với giá trị người dùng đã nhập.
+- Nếu captcha đúng, quá trình đăng nhập tiếp tục; nếu sai, hệ thống tạo một mã captcha mới.
+
+**Lưu ý: Lấy captcha 5 kí tự kết hợp cả chữ và số
+Đây là một độ dài vừa đủ để tránh bị đoán dễ dàng bởi các bot, 
+trong khi vẫn duy trì trải nghiệm người dùng không quá phức tạp. 
+Sự kết hợp giữa chữ và số cũng giúp tăng tính ngẫu nhiên, 
+làm khó các chương trình tự động hơn so với chỉ dùng một loại ký tự.
+
+3. Lưu mật khẩu (Remember Password): 
+Chọn Remember me ở lần đăng nhập đầu tiên, thì lần sau quay lại (nếu Tokenluudngnhap chưa hết hạn), chuyển hướng luôn đến trang chủ 
+Liên quan đến cookie và phiên đăng nhập để cho phép người dùng vẫn ở trạng thái đăng nhập mà không cần nhập lại thông tin sau một thời gian nhất định.
+Hệ thống của bạn sẽ lưu trữ một mã định danh người dùng (thường được mã hóa) trong cookie để nhận diện người dùng. 
+Khi người dùng truy cập lại trang, hệ thống sẽ kiểm tra cookie và tự động tạo phiên đăng nhập nếu cookie còn hợp lệ, giúp người dùng vào lại mà không cần đăng nhập.
+
+4. Hiển thị và Ẩn mật khẩu 
+Cung cấp nút để hiển thị hoặc ẩn mật khẩu giúp người dùng kiểm tra thông tin trước khi đăng nhập.
+
+5. Quản lý phiên đăng nhập
+Tạo và quản lý phiên (session) khi đăng nhập thành công.
+Hủy phiên khi đăng xuất và xóa các biến phiên để bảo vệ an toàn.
+
+6. Giới hạn thời gian giữa các lần đăng nhập
+Giới hạn thời gian giữa các lần thử đăng nhập thất bại để tránh tấn công brute-force.
+Cụ thể: Sau 3 lần thất bại, người dùng phải chờ thêm 30 giây trước khi thử lại.
+
+7. Khóa tài khoản sau nhiều lần thử đăng nhập thất bại
+Đếm số lần đăng nhập thất bại và khóa tài khoản tạm thời (hoặc yêu cầu xác thực qua email) sau một số lần thất bại liên tiếp.
+Cụ thể: Thực hiện khóa tài khoản khi người dùng nhập sai quá 5 lần liên tiếp, thực hiện gửi cảnh báo xác nhận danh tính người dùng qua email, người dùng sẽ không thể đăng nhập lại cho tới khi thực hiện xác minh qua email.
+
+**Phân biệt luồng xử lý 6 và 7:
+-Nhập sai quá 3 lần: Gửi cảnh báo xác nhận danh tính người dùng qua email, chứa link xác nhận, nếu xác nhận sẽ reset số lần thực hiện sai trước đó và tiếp tục cho phép đăng nhập
+-Nhập sai quá 5 lần mà không có xác nhận trước đó: Thực hiện tạm khóa tài khoản, lưu thời gian tạm khóa tài khoản và gửi cảnh báo qua email, trong thời gian tài khoản bị tạm khóa, không thể đăng nhập cho đến khi hết thời gian tạm khóa (setup 30p)
+
+8. Thông báo lỗi chung
+Thông báo lỗi chung khi đăng nhập thất bại, như "Sai tên đăng nhập hoặc mật khẩu", để tránh cung cấp thông tin cụ thể về tên đăng nhập hay mật khẩu.
+
+Hàm gửi mail tham khảo
+function sendVerificationEmail($email, $username, $token) {
+    require("vendor/phpmailer/phpmailer/src/PHPMailer.php");
+    require("vendor/phpmailer/phpmailer/src/SMTP.php");
+    require("vendor/phpmailer/phpmailer/src/Exception.php");
+    $mail = new phpmailer\phpmailer\phpmailer(true);
+    try {
+        $mail->SMTPDebug = 2; // Tăng mức gỡ lỗi để kiểm tra vấn đề
+        $mail->isSMTP();
+        $mail->CharSet = 'UTF-8';
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        // $mail->Username = 'nguyenphihungnd03@gmail.com';
+        // $mail->Password = 'pefs omjh bvuv cgcs';
+        $mail->Username = 'nguyenngoc51203@gmail.com';
+        $mail->Password = 'qnkx oika zgkm ycyq';
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port = 465;
+    
+        $mail->setFrom($mail->Username);
+        $mail->addAddress($email);
+    
+        $mail->isHTML(true);
+        $mail->Subject = "Xác nhận đăng nhập từ hệ thống";
+        $verificationLink = "http://localhost/dangnhap/index.php?user=" . urlencode($username) . "&token=" . $token;
+        $mail->Body = "Chúng tôi đã phát hiện nhiều lần đăng nhập sai vào tài khoản của bạn. Vui lòng xác nhận qua link này để tiếp tục đăng nhập: <a href='$verificationLink'>$verificationLink</a>";
+    
+        if (!$mail->send()) {
+            die("Gửi email thất bại. Lỗi: {$mail->ErrorInfo}");
+        }
+    } catch (Exception $e) {
+        die("Gửi email thất bại. Lỗi ngoại lệ: " . $e->getMessage());
+    }    
+}

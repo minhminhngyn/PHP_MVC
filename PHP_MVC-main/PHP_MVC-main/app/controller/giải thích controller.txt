@@ -1,0 +1,12 @@
+app/controller
+- folder Controller dùng để chứa các file có các hàm dùng để điều hướng đến các hàm, lớp 
+trong các folder Models (hàm dùng để tương tác cơ sở dữ liệu) và folder Views (hàm dùng để hiển thị)
+- Ví dụ: loaihangcontroller.php sẽ chứa các hàm để liên kết giữa các hàm trong các file .php
+trong app/Views/loaihang (vd: app/Views/loaihang/add.php để hiển thị giao diện thêm mới loại hàng)
+và các hàm trong file app/Models/loaihangmodel.php (ví dụ create() chứa câu lệnh insert để thêm 
+dữ liệu vào cơ sở dữ liệu).
+
+app/controller/homecontroller
+- kế thừa class "controller" trong core/controller
+- chứa hàm trỏ đến trang "trang chủ"
+- chứa một số hàm khác

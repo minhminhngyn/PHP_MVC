@@ -1,0 +1,11 @@
+router_core dùng để định tuyến.
+input: một url, có thể lấy từ hàm $_SERVER['REQUEST_URI']
+--> ví dụ: /ktra2/dangky/frm_dki.php (không có miền localhost)
+
+output: trả về những giá trị controller, action, parameters tương ứng với request từ url
+--> ví dụ: controller loaihang, action create, parameters masanpham01
+
++ hàm parseUrl($uri): dùng để tách url thành mảng các giá trị trong url
+ví dụ: /ktra2/dangky/frm_dki.php ---> ['ktra2','dangky','frm_dki.php']
+
++ hàm dispatch($uri): dùng để tìm giá trị cho controller, action, parameters
